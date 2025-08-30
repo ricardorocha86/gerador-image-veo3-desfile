@@ -7,7 +7,7 @@ from scripts.criar_galeria_html import criar_galeria_html
 from scripts.gerar_multiplos_videos import gerar_multiplos_videos
 from scripts.concatenar_videos import concatenar_videos
 
-client = genai.Client(api_key = 'AIzaSyAXOCQ7nO0tNb7d5vx-hCAb8epXui1o8Aw')
+client = genai.Client(api_key = 'SUA-CHAVE-API-GEMINI')
 
 async def executar_imagens(nome_anime):
     caminho_cenario = criar_cenario(client, nome_anime)  # Cenário
@@ -22,3 +22,4 @@ from config_anime import NOME_ANIME
 asyncio.run(executar_imagens(NOME_ANIME))  # Executa pipeline assíncrono
 gerar_multiplos_videos(client, NOME_ANIME)  # Vídeos sequencial após async
 concatenar_videos(NOME_ANIME)  # Edição final com trilha e contracapa
+

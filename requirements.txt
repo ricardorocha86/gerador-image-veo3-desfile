@@ -1,0 +1,5 @@
+# Gerador de Vídeos Desfile - Dependências
+google-genai==1.21.1
+moviepy==1.0.3
+Pillow==10.4.0
+asyncio==4.0.0

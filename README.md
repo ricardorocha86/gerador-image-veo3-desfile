@@ -1,5 +1,15 @@
 # 🎬 Gerador de Vídeos Desfile
 
+## 📱 Exemplos de Criações
+
+Veja alguns vídeos criados com este sistema:
+
+- [**Exemplo 1**](https://youtube.com/shorts/S2KbcxDjwjA) - Desfile gerado automaticamente
+- [**Exemplo 2**](https://youtube.com/shorts/HMliJhNpnSs) - Personagens em ação na passarela
+- [**Exemplo 3**](https://youtube.com/shorts/r0UTz-qA4D4) - Resultado final com trilha sonora
+
+---
+
 Sistema automatizado para criar vídeos de desfile de moda com personagens de anime usando IA generativa.
 
 ## 🚀 Tecnologias Principais

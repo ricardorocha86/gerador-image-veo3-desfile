@@ -2,6 +2,9 @@ import time
 import io
 from PIL import Image
 from google.genai import types
+import sys
+sys.path.append('.')  # Permite importar config_anime
+from config_anime import MODELO_GERADOR_VIDEO
 
 def gerar_video_simples(client, caminho_imagem, prompt, nome_arquivo = "video_teste.mp4"):
     tempo_inicio = time.time()  # Marca início
@@ -16,7 +19,7 @@ def gerar_video_simples(client, caminho_imagem, prompt, nome_arquivo = "video_te
             print(f"🎬 Gerando vídeo...")  # Início
             
             operacao = client.models.generate_videos(  # Solicita vídeo
-                model = "veo-3.0-generate-preview", # veo-3.0-fast-generate-preview | veo-3.0-generate-preview | veo-2.0-generate-001
+                model = MODELO_GERADOR_VIDEO,
                 prompt = prompt,
                 image = types.Image(image_bytes = image_bytes, mime_type = imagem.format),
                 config = types.GenerateVideosConfig(aspect_ratio = "16:9"),

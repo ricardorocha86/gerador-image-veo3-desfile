@@ -2,6 +2,9 @@ from PIL import Image
 from io import BytesIO
 import time
 import os
+import sys
+sys.path.append('.')  # Permite importar config_anime
+from config_anime import MODELO_GERADOR_PERSONAGEM, PROMPT_IMAGEM_PERSONAGEM_TEMPLATE
 
 def gerar_imagem_personagem(client, caminho_cenario, nome_anime, dados_personagem):
     """
@@ -18,49 +21,35 @@ def gerar_imagem_personagem(client, caminho_cenario, nome_anime, dados_personage
     """
     nome = dados_personagem['nome_personagem']
     cor = dados_personagem['cor_personagem']
-    acao = dados_personagem['acao_tipica']
     pose = dados_personagem['pose_inicial']
 
-    prompt = f"""
-    Create a COMPLETELY PHOTOREALISTIC HUMAN VERSION of {nome} from {nome_anime} in a fashion runway setting.
-
-    CRITICAL SIZE AND POSITIONING:
-    - Character must be SMALL in the image - only 50% of the total image height
-    - Character positioned EXACTLY in the CENTER of the image
-    - LARGE EMPTY SPACE above the character's head (25% of image)
-    - LARGE EMPTY SPACE below the character's feet (25% of image)
-    - Character should look DISTANT, not close-up 
-
-    HUMAN REALISM REQUIREMENTS:
-    - MUST be 100% realistic human, NOT animated/cartoon/drawn style
-    - Real human skin texture, pores, natural lighting
-    - Photographic quality like a real fashion magazine
-    - NO anime/cartoon features whatsoever
-
-    CHARACTER DETAILS:
-    - Maintain {nome}'s gender and key characteristics
-    - {pose}
-    - High-fashion outfit inspired by {nome}'s style
-    - {cor} color theme in lighting/outfit accents
-
-    TECHNICAL:
-    - Professional fashion photography with wide shot
-    - Studio lighting, sharp focus on character
-    - Photorealistic rendering, magazine quality
-    - NO TEXT OR WORDS anywhere in image
-    """
+    prompt = PROMPT_IMAGEM_PERSONAGEM_TEMPLATE.format(
+        nome=nome,
+        nome_anime=nome_anime,
+        cor=cor,
+        pose=pose
+    )
 
     imagem_cenario = Image.open(caminho_cenario)
 
     resposta = client.models.generate_content(
-        model="gemini-2.5-flash-image-preview",
-        contents=[prompt, imagem_cenario],
+        model=MODELO_GERADOR_PERSONAGEM,
+        contents=[imagem_cenario, prompt],
     )
+
+    # Verificações de segurança
+    if not resposta or not resposta.candidates:
+        print(f"⚠️ {nome}: Resposta vazia da API")
+        return None
+        
+    if not resposta.candidates[0].content or not resposta.candidates[0].content.parts:
+        print(f"⚠️ {nome}: Conteúdo vazio na resposta")
+        return None
 
     partes_imagem = [
         part.inline_data.data
         for part in resposta.candidates[0].content.parts
-        if part.inline_data
+        if hasattr(part, 'inline_data') and part.inline_data
     ]
 
     if partes_imagem:
@@ -77,5 +66,7 @@ def gerar_imagem_personagem(client, caminho_cenario, nome_anime, dados_personage
         imagem.save(caminho_arquivo)
         imagem.show()
         return {'caminho': caminho_arquivo, 'dados': dados_personagem}  # Retorna mapeamento
+    else:
+        print(f"⚠️ {nome}: API retornou texto ao invés de imagem")
     
     return None

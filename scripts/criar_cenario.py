@@ -1,6 +1,9 @@
 from PIL import Image
 from io import BytesIO
 import os
+import sys
+sys.path.append('.')  # Permite importar config_anime
+from config_anime import MODELO_GERADOR_CENARIO, PROMPT_CENARIO_TEMPLATE
 
 def criar_cenario(client, nome_anime):
     """
@@ -15,10 +18,19 @@ def criar_cenario(client, nome_anime):
     """
     print("Criando cenário do desfile...")
     
-    resposta = client.models.generate_content(
-        model="gemini-2.5-flash-image-preview",
-        contents="The runway scene captures a modern, indoor fashion show setting, devoid of a model, focusing solely on the dynamic environment. A sleek, illuminated glass runway stretches into the distance, flanked on both sides by a seated audience, many of whom are applauding or capturing the event on their phones. The background features expansive digital LED screens showcasing a vibrant, cosmic tableau of swirling blues, oranges, and purples, reminiscent of a distant galaxy or nebula. Overhead, bright spotlights cast a brilliant glow on the walkway, while a shower of colorful confetti descends from the ceiling, adding a festive and energetic ambiance to the entire spectacle."
-    )
+    prompt_cenario = PROMPT_CENARIO_TEMPLATE.format(nome_anime=nome_anime)
+    
+    while True:
+        try:
+            resposta = client.models.generate_content(
+                model=MODELO_GERADOR_CENARIO,
+                contents=prompt_cenario
+            )
+            break
+        except Exception as erro:
+            print(f"❌ {erro}")
+            import time
+            time.sleep(5)
 
     # Cria pasta dentro de resultados
     os.makedirs('resultados', exist_ok = True)  # Garante pasta resultados
@@ -33,5 +45,6 @@ def criar_cenario(client, nome_anime):
         imagem.save(caminho_cenario)
         imagem.show()
         print(f"✓ Cenário criado: {caminho_cenario}")
-
-    return caminho_cenario
+        return caminho_cenario
+    
+    return None

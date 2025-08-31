@@ -48,14 +48,15 @@ Sistema automatizado para criar vídeos de desfile de moda com personagens de an
 
 ## 🏗️ Arquitetura do Sistema
 
-### **Pipeline de Geração**
+### **Pipeline de Geração com Confirmações**
 ```
-1. Obter Personagens (Gemini) → Lista JSON
-2. Criar Cenário (Gemini) → Imagem PNG
-3. Gerar Imagens Async (Gemini) → Múltiplas PNG
-4. Gerar Vídeos Sequencial (Veo) → Múltiplas MP4
-5. Concatenar + Trilha (MoviePy) → Vídeo final
-6. Versão Stories (MoviePy) → 9:16 vertical
+1. Cálculo de Custos → Confirmação usuário (sim/não)
+2. Obter Personagens (Gemini) → Tabela + Confirmação (ok/novo/parar)
+3. Criar Cenário (Gemini) → Imagem + Confirmação (ok/novo)
+4. Gerar Imagens Async (Gemini) → Galeria + Confirmação (ok/novo/parar)
+5. Gerar Vídeos Sequencial (Veo) → Múltiplas MP4
+6. Concatenar + Trilha (MoviePy) → Vídeo final 16:9
+7. Versão Stories (MoviePy) → 4:5 vertical (576x720)
 ```
 
 ### **Estrutura de Arquivos**
@@ -113,14 +114,14 @@ Sistema automatizado para criar vídeos de desfile de moda com personagens de an
 
 ### **Formatos Suportados**
 - **16:9 Landscape** - Vídeo principal para YouTube/TV
-- **9:16 Portrait** - Versão Stories para Instagram/TikTok
-- **Aspect ratio preservado** - Sem distorções
+- **4:5 Portrait** - Versão Stories (576x720) para Instagram/TikTok
+- **Aspect ratio preservado** - Crop inteligente sem distorções
 
 ### **Efeitos Profissionais**
 - **Fade in/out** - Transições suaves (0.3s)
 - **Contracapa** - 4 segundos de fechamento
 - **Trilha sonora** - Sincronização automática
-- **Crop inteligente** - Centro mantido no Stories
+- **Crop inteligente** - Centro mantido na versão 4:5
 
 ## 🔧 Instalação
 
@@ -164,9 +165,24 @@ O sistema suporta qualquer anime/franquia - a IA se adapta automaticamente!
 ## 🎬 Resultado Final
 
 - **Vídeo 16:9** - Todos personagens em sequência + contracapa + trilha
-- **Vídeo 9:16** - Mesma sequência cortada para Stories
-- **Galeria HTML** - Visualização das imagens geradas
+- **Vídeo 4:5** - Versão Stories (576x720) otimizada para redes sociais
+- **Galeria HTML** - Visualização interativa das imagens geradas
 - **Dados JSON** - Metadados dos personagens para reutilização
+- **Tabela de Personagens** - Preview detalhado antes da geração
+
+## 🎛️ Controles Interativos
+
+### **Sistema de Confirmações**
+- **Custos** - Visualize gastos estimados antes de iniciar
+- **Cenário** - Aprove ou regenere o cenário de fundo
+- **Personagens** - Revise tabela detalhada com nome, cor, ação e pose
+- **Imagens** - Confirme qualidade das imagens ou regenere
+- **Controle Total** - Pare, continue ou refaça qualquer etapa
+
+### **Códecs Otimizados**
+- **H.264 (libx264)** - Máxima compatibilidade de vídeo
+- **AAC** - Codec de áudio padrão para MP4
+- **Configuração minimalista** - Apenas parâmetros essenciais
 
 ---
 

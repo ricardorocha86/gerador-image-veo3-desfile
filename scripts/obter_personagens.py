@@ -1,11 +1,14 @@
 from pydantic import BaseModel, Field
 import json
+import sys
+sys.path.append('.')  # Permite importar config_anime
+from config_anime import MODELO_OBTER_PERSONAGENS, PROMPT_PERSONAGENS_TEMPLATE, QUANTIDADE_PERSONAGENS
 
 class InfoPersonagem(BaseModel):
-    nome_personagem: str = Field(..., description="O nome do personagem do anime.")
-    cor_personagem: str = Field(..., description="Uma cor associada ao personagem.")
-    acao_tipica: str = Field(..., description="Uma ação típica que o personagem realizaria em um ambiente de desfile de moda.")
-    pose_inicial: str = Field(..., description="Texto em inglês descrevendo a roupa, detalhes e a pose inicial do personagem no desfile, caracterizando-o com suas características únicas.")
+    nome_personagem: str = Field(..., description="O nome principal e mais simples do personagem, sem títulos ou sobrenomes desnecessários.")
+    cor_personagem: str = Field(..., description="Uma única cor simples associada ao personagem, escrita por extenso em português.")
+    acao_tipica: str = Field(..., description="Descrição DETALHADA e MINUCIOSA em inglês de uma ação maluca e dinâmica que o personagem faria em um vídeo de 8 segundos no desfile. Deve incluir movimentos específicos do corpo, gestos característicos, efeitos visuais únicos do personagem, velocidade dos movimentos e qualquer habilidade especial. Seja MUITO específico nos detalhes da ação.")
+    pose_inicial: str = Field(..., description="Descrição EXTREMAMENTE DETALHADA e MINUCIOSA em inglês da pose inicial do personagem para o frame inicial do vídeo. Deve incluir: posição exata do corpo, ângulo das pernas e braços, postura das mãos, expressão facial específica, direção do olhar, detalhes completos da roupa característica, acessórios, penteado, e qualquer elemento visual único do personagem. Seja MUITO preciso em cada detalhe visual.")
 
 def obter_personagens(client, nome_anime):
     """
@@ -18,27 +21,26 @@ def obter_personagens(client, nome_anime):
     Returns:
         list: Lista de personagens em formato JSON.
     """
-    estilo = "humano realistico"
-    ambiente = "desfile de moda"
-
-    prompt = f"""Dado o anime '{nome_anime}', no estilo '{estilo}', ambientado em um '{ambiente}', liste os personagens principais e para cada um,
-        forneça a cor associada, uma ação típica que eles realizariam neste cenário e uma descrição da pose inicial no desfile, incluindo detalhes da roupa e características do personagem.
-        Forneça a saída como uma lista JSON de objetos com as chaves 'nome_personagem', 'cor_personagem', 'acao_tipica' e 'pose_inicial'.
-        Escolha os 7 mais famosos e queridos do publico. Desses 7, use 4 ou 5 principais da obra e 2 ou 3 personagens clássicos.
-        Por exemplo, em One Piece, Luffy, Zoro, Sanji, Brook, Franky seriam personagens principais, euquanto Roger, Garp, Barba Branca seriam clássicos.
-
-        IMPORTANTE: Na descrição da 'pose_inicial', NÃO inclua nenhum texto escrito, palavras, letras ou qualquer elemento textual nas imagens. Apenas descreva poses, roupas e características visuais.
-
-        """
-
-    resposta = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": list[InfoPersonagem],
-        },
+    prompt = PROMPT_PERSONAGENS_TEMPLATE.format(
+        nome_anime=nome_anime,
+        quantidade_total=QUANTIDADE_PERSONAGENS
     )
+
+    while True:
+        try:
+            resposta = client.models.generate_content(
+                model=MODELO_OBTER_PERSONAGENS,
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": list[InfoPersonagem],
+                },
+            )
+            break
+        except Exception as erro:
+            print(f"❌ {erro}")
+            import time
+            time.sleep(5)
  
 
     lista_personagens = json.loads(resposta.text)
